@@ -19,6 +19,8 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import type { UseChatHelpers } from '@ai-sdk/react';
+import { DoctorCard } from './doctor-card';
+import { AppointmentConfirmation } from './appointment-confirmation';
 
 const PurePreviewMessage = ({
   chatId,
@@ -268,6 +270,14 @@ const PurePreviewMessage = ({
                         </div>
                       </div>
                     );
+                  }
+
+                  if (toolName === 'doctorDetails') {
+                    return <DoctorCard key={toolCallId} {...result} />;
+                  }
+
+                  if (toolName === 'bookAppointment') {
+                    return <AppointmentConfirmation key={toolCallId} time={result.time} doctor={result.doctor} />;
                   }
 
                   if ([

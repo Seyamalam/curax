@@ -87,19 +87,36 @@ const listDoctors = tool({
 });
 
 const doctorDetails = tool({
-  description: 'Get detailed information about a doctor by their ID',
-  parameters: z.object({ doctorId: z.number() }),
-  execute: async ({ doctorId }) => {
-    const doctor = await db.select({
-      id: doctors.id,
-      name: doctors.name,
-      specialty: doctors.specialty,
-      hospital: doctors.hospital,
-      experience: doctors.experience,
-      availability: doctors.availability,
-      fees: doctors.fees,
-      bio: doctors.bio,
-    }).from(doctors).where(eq(doctors.id, doctorId));
+  description: 'Get detailed information about a doctor by their ID or name',
+  parameters: z.object({
+    doctorId: z.number().optional(),
+    name: z.string().optional(),
+  }),
+  execute: async ({ doctorId, name }) => {
+    let doctor;
+    if (doctorId) {
+      doctor = await db.select({
+        id: doctors.id,
+        name: doctors.name,
+        specialty: doctors.specialty,
+        hospital: doctors.hospital,
+        experience: doctors.experience,
+        availability: doctors.availability,
+        fees: doctors.fees,
+        bio: doctors.bio,
+      }).from(doctors).where(eq(doctors.id, doctorId));
+    } else if (name) {
+      doctor = await db.select({
+        id: doctors.id,
+        name: doctors.name,
+        specialty: doctors.specialty,
+        hospital: doctors.hospital,
+        experience: doctors.experience,
+        availability: doctors.availability,
+        fees: doctors.fees,
+        bio: doctors.bio,
+      }).from(doctors).where(eq(doctors.name, name));
+    }
     if (!doctor || doctor.length === 0) {
       throw new Error('Doctor not found');
     }
