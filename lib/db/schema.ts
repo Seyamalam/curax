@@ -230,3 +230,31 @@ export const labBookings = pgTable('lab_bookings', {
   locationType: text('location_type').notNull(), // 'home' or 'clinic'
   status: text('status').default('booked'),
 });
+
+// Medications table
+export const medications = pgTable('medications', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  name: text('name').notNull(),
+  dosage: text('dosage').notNull(),
+  notes: text('notes'),
+  startDate: timestamp('start_date').notNull(),
+  endDate: timestamp('end_date'),
+});
+
+// Medication Reminders table
+export const medicationReminders = pgTable('medication_reminders', {
+  id: serial('id').primaryKey(),
+  medicationId: integer('medication_id').notNull().references(() => medications.id),
+  userId: text('user_id').notNull(),
+  date: timestamp('date').notNull(), // Date for the reminder
+  timeOfDay: text('time_of_day').notNull(), // e.g., '08:00', '20:00'
+  status: text('status').default('pending'), // pending/taken/missed
+});
+
+// Push Subscriptions table
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  subscription: json('subscription').notNull(),
+});

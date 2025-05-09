@@ -78,6 +78,20 @@
       "when": 1746768357768,
       "tag": "0010_jazzy_nomad",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1746770472349,
+      "tag": "0011_warm_the_captain",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1746773246564,
+      "tag": "0012_youthful_queen_noir",
+      "breakpoints": true
     }
   ]
 }

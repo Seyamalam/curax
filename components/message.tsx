@@ -390,6 +390,68 @@ const PurePreviewMessage = ({
                     );
                   }
 
+                  if (toolName === 'addMedication') {
+                    return (
+                      <div key={toolCallId} className="my-2">
+                        <div className="font-semibold">Medication Added!</div>
+                        <div className="text-muted-foreground text-sm">
+                          Your medication <span className="font-medium">{result.name}</span> ({result.dosage}) has been added with reminders.
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (toolName === 'listMedications') {
+                    return (
+                      <div key={toolCallId} className="my-2">
+                        <div className="font-semibold mb-1">Your Medications:</div>
+                        <ul className="list-disc ml-6">
+                          {Array.isArray(result) && result.length > 0 ? (
+                            result.map((med: any) => (
+                              <li key={med.id}>
+                                <span className="font-medium">{med.name}</span> ({med.dosage})
+                                {med.notes && <span className="text-xs text-zinc-400"> — {med.notes}</span>}
+                                <span className="text-xs text-zinc-400"> (from {med.startDate ? new Date(med.startDate).toLocaleDateString() : ''}{med.endDate ? ` to ${new Date(med.endDate).toLocaleDateString()}` : ''})</span>
+                              </li>
+                            ))
+                          ) : (
+                            <li>No medications found.</li>
+                          )}
+                        </ul>
+                      </div>
+                    );
+                  }
+
+                  if (toolName === 'listMedicationReminders') {
+                    return (
+                      <div key={toolCallId} className="my-2">
+                        <div className="font-semibold mb-1">Your Medication Reminders:</div>
+                        <ul className="list-decimal ml-6">
+                          {Array.isArray(result) && result.length > 0 ? (
+                            result.map((rem: any) => (
+                              <li key={rem.id}>
+                                <span className="font-medium">{rem.timeOfDay}</span> on <span className="text-xs text-zinc-400">{rem.date ? new Date(rem.date).toLocaleDateString() : ''}</span> — <span className="text-muted-foreground">{rem.status}</span>
+                              </li>
+                            ))
+                          ) : (
+                            <li>No medication reminders found.</li>
+                          )}
+                        </ul>
+                      </div>
+                    );
+                  }
+
+                  if (toolName === 'markMedicationReminder') {
+                    return (
+                      <div key={toolCallId} className="my-2">
+                        <div className="font-semibold">Medication Reminder Updated!</div>
+                        <div className="text-muted-foreground text-sm">
+                          This reminder has been marked as <span className="font-medium">{result.status}</span>.
+                        </div>
+                      </div>
+                    );
+                  }
+
                   if ([
                     'listDoctors',
                     'bookAppointment',

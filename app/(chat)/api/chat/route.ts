@@ -36,7 +36,7 @@ import {
 import { after } from 'next/server';
 import type { Chat } from '@/lib/db/schema';
 import { z } from 'zod';
-import { doctors, appointments, ambulanceBookings, labs, labTests, labBookings } from '@/lib/db/schema';
+import { doctors, appointments, ambulanceBookings, labs, labTests, labBookings, medications, medicationReminders } from '@/lib/db/schema';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq, and } from 'drizzle-orm';
@@ -414,6 +414,100 @@ const cancelLabBooking = tool({
   },
 });
 
+const addMedication = tool({
+  description: 'Add a medication and set up reminders',
+  parameters: z.object({
+    name: z.string(),
+    dosage: z.string(),
+    notes: z.string().optional(),
+    startDate: z.string().describe('Start date in ISO format'),
+    endDate: z.string().optional().describe('End date in ISO format'),
+    reminders: z.array(z.object({
+      date: z.string().describe('Date in ISO format'),
+      timeOfDay: z.string().describe('Time of day, e.g., 08:00'),
+    })),
+  }),
+  execute: async ({ name, dosage, notes, startDate, endDate, reminders }) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const [med] = await db.insert(medications).values({
+      userId: session.user.id,
+      name,
+      dosage,
+      notes,
+      startDate: new Date(startDate),
+      endDate: endDate ? new Date(endDate) : null,
+    }).returning();
+    if (!med) throw new Error('Failed to add medication');
+    // Insert reminders
+    for (const r of reminders) {
+      await db.insert(medicationReminders).values({
+        medicationId: med.id,
+        userId: session.user.id,
+        date: new Date(r.date),
+        timeOfDay: r.timeOfDay,
+      });
+    }
+    return med;
+  },
+});
+
+const listMedications = tool({
+  description: 'List all medications for the current user',
+  parameters: z.object({}),
+  execute: async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    return await db.select({
+      id: medications.id,
+      name: medications.name,
+      dosage: medications.dosage,
+      notes: medications.notes,
+      startDate: medications.startDate,
+      endDate: medications.endDate,
+    }).from(medications).where(eq(medications.userId, session.user.id));
+  },
+});
+
+const listMedicationReminders = tool({
+  description: 'List all medication reminders for the current user',
+  parameters: z.object({}),
+  execute: async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    return await db.select({
+      id: medicationReminders.id,
+      medicationId: medicationReminders.medicationId,
+      date: medicationReminders.date,
+      timeOfDay: medicationReminders.timeOfDay,
+      status: medicationReminders.status,
+    }).from(medicationReminders).where(eq(medicationReminders.userId, session.user.id));
+  },
+});
+
+const markMedicationReminder = tool({
+  description: 'Mark a medication reminder as taken or missed',
+  parameters: z.object({ reminderId: z.number(), status: z.enum(['taken', 'missed']) }),
+  execute: async ({ reminderId, status }) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const [updated] = await db.update(medicationReminders)
+      .set({ status })
+      .where(and(eq(medicationReminders.id, reminderId), eq(medicationReminders.userId, session.user.id)))
+      .returning();
+    if (!updated) throw new Error('Reminder not found or not yours');
+    return updated;
+  },
+});
+
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
@@ -530,6 +624,10 @@ export async function POST(request: Request) {
                   'bookLabTest',
                   'listLabBookings',
                   'cancelLabBooking',
+                  'addMedication',
+                  'listMedications',
+                  'listMedicationReminders',
+                  'markMedicationReminder',
                 ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
@@ -554,6 +652,10 @@ export async function POST(request: Request) {
             bookLabTest,
             listLabBookings,
             cancelLabBooking,
+            addMedication,
+            listMedications,
+            listMedicationReminders,
+            markMedicationReminder,
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
