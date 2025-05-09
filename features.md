@@ -7,8 +7,14 @@ This document lists the current capabilities of the doctor appointment chatbot s
 ## Core Features
 
 - **Conversational AI Chatbot**
-  - Friendly, helpful assistant for booking and managing doctor appointments
+  - Friendly, helpful assistant for booking and managing doctor appointments, lab tests, ambulances, and checking symptoms
   - Natural language interface for all actions
+
+## Symptom Checker
+
+- Users can describe symptoms in natural language
+- AI suggests possible causes (informational only, not a diagnosis)
+- AI recommends seeing a doctor if symptoms are serious or unclear
 
 ## Doctor Management
 
@@ -35,12 +41,25 @@ This document lists the current capabilities of the doctor appointment chatbot s
 - Reschedule an appointment to a new time (with confirmation)
 - All appointment flows now use and display the full doctor profile details
 
+## Lab Test Booking
+
+- List available labs, their addresses, time slots, and offered tests (blood, imaging, etc.)
+- Show test prices and available time slots
+- Book lab tests at home or at a clinic
+- View and cancel lab test bookings
+
+## Ambulance Booking
+
+- Book an ambulance for emergencies or transport
+- Specify pickup location, destination, and time
+- View and cancel ambulance bookings
+
 ## User Experience
 
 - Clean, user-friendly chat UI
 - No raw JSON or technical output shown to users
 - All tool results are formatted for clarity
-- Doctor and appointment details are presented in a rich, readable format
+- Doctor, appointment, lab, and ambulance details are presented in a rich, readable format
 
 ---
 
@@ -54,4 +73,4 @@ This document lists the current capabilities of the doctor appointment chatbot s
 
 ---
 
-_Last updated: [today's date]_
+_Last updated: 2024-06-10_

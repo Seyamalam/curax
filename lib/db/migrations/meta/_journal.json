@@ -64,6 +64,20 @@
       "when": 1746649467819,
       "tag": "0008_flimsy_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1746767550118,
+      "tag": "0009_lyrical_agent_zero",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1746768357768,
+      "tag": "0010_jazzy_nomad",
+      "breakpoints": true
     }
   ]
 }

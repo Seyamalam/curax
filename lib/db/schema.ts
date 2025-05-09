@@ -192,3 +192,41 @@ export const appointments = pgTable('appointments', {
   time: timestamp('time').notNull(),
   status: text('status').default('booked'),
 });
+
+// Ambulance Booking table
+export const ambulanceBookings = pgTable('ambulance_bookings', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  pickupLocation: text('pickup_location').notNull(),
+  destination: text('destination').notNull(),
+  time: timestamp('time').notNull(),
+  status: text('status').default('booked'),
+});
+
+// Labs table
+export const labs = pgTable('labs', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  address: text('address').notNull(),
+  timeSlots: json('time_slots').notNull(), // Array of available time slots
+});
+
+// Lab Tests table
+export const labTests = pgTable('lab_tests', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(), // e.g., Blood Test, X-Ray
+  type: text('type').notNull(), // e.g., blood, imaging
+  price: integer('price').notNull(),
+  labId: integer('lab_id').notNull().references(() => labs.id),
+});
+
+// Lab Bookings table
+export const labBookings = pgTable('lab_bookings', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  labId: integer('lab_id').notNull().references(() => labs.id),
+  labTestId: integer('lab_test_id').notNull().references(() => labTests.id),
+  time: timestamp('time').notNull(),
+  locationType: text('location_type').notNull(), // 'home' or 'clinic'
+  status: text('status').default('booked'),
+});

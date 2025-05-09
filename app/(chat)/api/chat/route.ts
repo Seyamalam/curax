@@ -36,7 +36,7 @@ import {
 import { after } from 'next/server';
 import type { Chat } from '@/lib/db/schema';
 import { z } from 'zod';
-import { doctors, appointments } from '@/lib/db/schema';
+import { doctors, appointments, ambulanceBookings, labs, labTests, labBookings } from '@/lib/db/schema';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq, and } from 'drizzle-orm';
@@ -223,6 +223,197 @@ const rescheduleAppointment = tool({
   },
 });
 
+const bookAmbulance = tool({
+  description: 'Book an ambulance for the user',
+  parameters: z.object({
+    pickupLocation: z.string().describe('Pickup location as plain text'),
+    destination: z.string().describe('Destination as plain text'),
+    time: z.string().describe('Ambulance booking time in ISO format'),
+  }),
+  execute: async ({ pickupLocation, destination, time }) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const [booking] = await db
+      .insert(ambulanceBookings)
+      .values({
+        userId: session.user.id,
+        pickupLocation,
+        destination,
+        time: new Date(time),
+      })
+      .returning();
+    if (!booking) {
+      throw new Error('Failed to book ambulance');
+    }
+    return booking;
+  },
+});
+
+const listAmbulanceBookings = tool({
+  description: 'List all ambulance bookings for the current user',
+  parameters: z.object({}),
+  execute: async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const bookings = await db
+      .select({
+        id: ambulanceBookings.id,
+        pickupLocation: ambulanceBookings.pickupLocation,
+        destination: ambulanceBookings.destination,
+        time: ambulanceBookings.time,
+        status: ambulanceBookings.status,
+      })
+      .from(ambulanceBookings)
+      .where(eq(ambulanceBookings.userId, session.user.id));
+    return bookings;
+  },
+});
+
+const cancelAmbulanceBooking = tool({
+  description: 'Cancel an ambulance booking by its ID',
+  parameters: z.object({ bookingId: z.number() }),
+  execute: async ({ bookingId }) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const [updated] = await db
+      .update(ambulanceBookings)
+      .set({ status: 'cancelled' })
+      .where(and(eq(ambulanceBookings.id, bookingId), eq(ambulanceBookings.userId, session.user.id)))
+      .returning();
+    if (!updated) {
+      throw new Error('Ambulance booking not found or not yours');
+    }
+    return updated;
+  },
+});
+
+const listLabs = tool({
+  description: 'List all available labs, their tests, prices, and time slots',
+  parameters: z.object({}),
+  execute: async () => {
+    // Get all labs
+    const allLabs = await db.select({
+      id: labs.id,
+      name: labs.name,
+      address: labs.address,
+      timeSlots: labs.timeSlots,
+    }).from(labs);
+    // For each lab, get its tests
+    const labsWithTests = await Promise.all(
+      allLabs.map(async (lab) => {
+        const tests = await db.select({
+          id: labTests.id,
+          name: labTests.name,
+          type: labTests.type,
+          price: labTests.price,
+        }).from(labTests).where(eq(labTests.labId, lab.id));
+        return { ...lab, tests };
+      })
+    );
+    return labsWithTests;
+  },
+});
+
+const bookLabTest = tool({
+  description: 'Book a lab test at home or at a clinic',
+  parameters: z.object({
+    labId: z.number(),
+    labTestId: z.number(),
+    time: z.string().describe('Lab test time in ISO format'),
+    locationType: z.enum(['home', 'clinic']),
+  }),
+  execute: async ({ labId, labTestId, time, locationType }) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const [booking] = await db
+      .insert(labBookings)
+      .values({
+        userId: session.user.id,
+        labId,
+        labTestId,
+        time: new Date(time),
+        locationType,
+      })
+      .returning();
+    if (!booking) {
+      throw new Error('Failed to book lab test');
+    }
+    // Fetch lab and test details for confirmation
+    const [lab] = await db.select({
+      id: labs.id,
+      name: labs.name,
+      address: labs.address,
+    }).from(labs).where(eq(labs.id, labId));
+    const [test] = await db.select({
+      id: labTests.id,
+      name: labTests.name,
+      type: labTests.type,
+      price: labTests.price,
+    }).from(labTests).where(eq(labTests.id, labTestId));
+    return { ...booking, lab, test };
+  },
+});
+
+const listLabBookings = tool({
+  description: 'List all lab test bookings for the current user',
+  parameters: z.object({}),
+  execute: async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const bookings = await db
+      .select({
+        id: labBookings.id,
+        time: labBookings.time,
+        locationType: labBookings.locationType,
+        status: labBookings.status,
+        lab: {
+          id: labs.id,
+          name: labs.name,
+        },
+        test: {
+          id: labTests.id,
+          name: labTests.name,
+          type: labTests.type,
+        },
+      })
+      .from(labBookings)
+      .where(eq(labBookings.userId, session.user.id))
+      .leftJoin(labs, eq(labBookings.labId, labs.id))
+      .leftJoin(labTests, eq(labBookings.labTestId, labTests.id));
+    return bookings;
+  },
+});
+
+const cancelLabBooking = tool({
+  description: 'Cancel a lab test booking by its ID',
+  parameters: z.object({ bookingId: z.number() }),
+  execute: async ({ bookingId }) => {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    const [updated] = await db
+      .update(labBookings)
+      .set({ status: 'cancelled' })
+      .where(and(eq(labBookings.id, bookingId), eq(labBookings.userId, session.user.id)))
+      .returning();
+    if (!updated) {
+      throw new Error('Lab booking not found or not yours');
+    }
+    return updated;
+  },
+});
+
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
@@ -332,6 +523,13 @@ export async function POST(request: Request) {
                   'listAppointments',
                   'cancelAppointment',
                   'rescheduleAppointment',
+                  'bookAmbulance',
+                  'listAmbulanceBookings',
+                  'cancelAmbulanceBooking',
+                  'listLabs',
+                  'bookLabTest',
+                  'listLabBookings',
+                  'cancelLabBooking',
                 ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
@@ -349,6 +547,13 @@ export async function POST(request: Request) {
             listAppointments,
             cancelAppointment,
             rescheduleAppointment,
+            bookAmbulance,
+            listAmbulanceBookings,
+            cancelAmbulanceBooking,
+            listLabs,
+            bookLabTest,
+            listLabBookings,
+            cancelLabBooking,
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
