@@ -258,3 +258,19 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
   userId: text('user_id').notNull(),
   subscription: json('subscription').notNull(),
 });
+
+// Prescriptions table
+export const prescriptions = pgTable('prescriptions', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  doctorId: integer('doctor_id').notNull().references(() => doctors.id),
+  medication: text('medication').notNull(),
+  dosage: text('dosage').notNull(),
+  instructions: text('instructions'),
+  issuedAt: timestamp('issued_at').notNull(),
+  expiresAt: timestamp('expires_at'),
+  refillable: boolean('refillable').default(false),
+  refillsRemaining: integer('refills_remaining').default(0),
+  fileUrl: text('file_url'), // URL to digital prescription file (PDF, etc.)
+  status: text('status').default('active'), // active, expired, cancelled
+});

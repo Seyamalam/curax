@@ -36,7 +36,7 @@ import {
 import { after } from 'next/server';
 import type { Chat } from '@/lib/db/schema';
 import { z } from 'zod';
-import { doctors, appointments, ambulanceBookings, labs, labTests, labBookings, medications, medicationReminders } from '@/lib/db/schema';
+import { doctors, appointments, ambulanceBookings, labs, labTests, labBookings, medications, medicationReminders, prescriptions } from '@/lib/db/schema';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq, and } from 'drizzle-orm';
@@ -508,6 +508,74 @@ const markMedicationReminder = tool({
   },
 });
 
+const requestPrescriptionRefill = tool({
+  description: 'Request a prescription refill for a given prescription ID',
+  parameters: z.object({ prescriptionId: z.number() }),
+  execute: async ({ prescriptionId }) => {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('User not authenticated');
+    // Find prescription and check if refillable and refills remain
+    const [prescription] = await db
+      .select({
+        id: prescriptions.id,
+        userId: prescriptions.userId,
+        refillable: prescriptions.refillable,
+        refillsRemaining: prescriptions.refillsRemaining,
+        status: prescriptions.status,
+      })
+      .from(prescriptions)
+      .where(and(eq(prescriptions.id, prescriptionId), eq(prescriptions.userId, session.user.id)));
+    if (!prescription) throw new Error('Prescription not found');
+    if (!prescription.refillable || prescription.refillsRemaining === null || prescription.refillsRemaining <= 0 || prescription.status !== 'active') {
+      throw new Error('Prescription is not refillable, has no refills remaining, or is invalid');
+    }
+    // Decrement refillsRemaining
+    const [updated] = await db
+      .update(prescriptions)
+      .set({ refillsRemaining: (prescription.refillsRemaining ?? 0) - 1 })
+      .where(eq(prescriptions.id, prescriptionId))
+      .returning();
+    return { ...updated, message: 'Refill requested and processed.' };
+  },
+});
+
+const listPrescriptions = tool({
+  description: 'List all prescriptions for the current user',
+  parameters: z.object({}),
+  execute: async () => {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('User not authenticated');
+    return await db.select({
+      id: prescriptions.id,
+      doctorId: prescriptions.doctorId,
+      medication: prescriptions.medication,
+      dosage: prescriptions.dosage,
+      instructions: prescriptions.instructions,
+      issuedAt: prescriptions.issuedAt,
+      expiresAt: prescriptions.expiresAt,
+      refillable: prescriptions.refillable,
+      refillsRemaining: prescriptions.refillsRemaining,
+      fileUrl: prescriptions.fileUrl,
+      status: prescriptions.status,
+    }).from(prescriptions).where(eq(prescriptions.userId, session.user.id));
+  },
+});
+
+const downloadPrescription = tool({
+  description: 'Download a digital prescription file by prescription ID',
+  parameters: z.object({ prescriptionId: z.number() }),
+  execute: async ({ prescriptionId }) => {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error('User not authenticated');
+    const [prescription] = await db
+      .select({ fileUrl: prescriptions.fileUrl })
+      .from(prescriptions)
+      .where(and(eq(prescriptions.id, prescriptionId), eq(prescriptions.userId, session.user.id)));
+    if (!prescription || !prescription.fileUrl) throw new Error('Prescription file not found');
+    return { url: prescription.fileUrl };
+  },
+});
+
 export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
@@ -628,6 +696,9 @@ export async function POST(request: Request) {
                   'listMedications',
                   'listMedicationReminders',
                   'markMedicationReminder',
+                  'requestPrescriptionRefill',
+                  'listPrescriptions',
+                  'downloadPrescription',
                 ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
@@ -656,6 +727,9 @@ export async function POST(request: Request) {
             listMedications,
             listMedicationReminders,
             markMedicationReminder,
+            requestPrescriptionRefill,
+            listPrescriptions,
+            downloadPrescription,
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {

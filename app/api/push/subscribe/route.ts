@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { pushSubscriptions } from '@/lib/db/schema';
