@@ -17,6 +17,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow public access to static files and PWA assets
+  if (
+    pathname === '/manifest.json' ||
+    pathname.startsWith('/favicon') ||
+    pathname === '/sw.js' ||
+    pathname.startsWith('/android-chrome') ||
+    pathname.startsWith('/apple-touch-icon') ||
+    pathname.startsWith('/icon-') ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml'
+  ) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
@@ -52,8 +66,8 @@ export const config = {
      * Match all request paths except for the ones starting with:
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     * - favicon.ico, sitemap.xml, robots.txt, manifest.json, sw.js, android-chrome, apple-touch-icon, icon-
      */
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!_next/static|_next/image|favicon|manifest.json|sw.js|android-chrome|apple-touch-icon|icon-|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 };
