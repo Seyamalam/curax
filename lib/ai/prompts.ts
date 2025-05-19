@@ -118,6 +118,8 @@ export const systemPrompt = ({
 
   if (selectedChatModel === 'chat-model-reasoning') {
     return `${doctorAppointmentPrompt}\n\n${requestPrompt}`;
+  } else if (selectedChatModel === 'groq-llama4') {
+    return `${doctorAppointmentPrompt}\n\n${requestPrompt}`;
   } else {
     return `${doctorAppointmentPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
   }
