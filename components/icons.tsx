@@ -1172,3 +1172,20 @@ export const WarningIcon = ({ size = 16 }: { size?: number }) => {
     </svg>
   );
 };
+
+export const MicIcon = ({ color = 'currentColor', size = 16 }: { color?: string; size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ color }}
+  >
+    <rect width="24" height="24" fill="none" />
+    <path
+      d="M12 17a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v6a4 4 0 0 0 4 4zm5-4a1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V21a1 1 0 1 1-2 0v-1.08A7 7 0 0 1 5 13a1 1 0 1 1 2 0 5 5 0 0 0 10 0z"
+      fill={color}
+    />
+  </svg>
+);

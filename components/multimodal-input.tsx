@@ -16,7 +16,7 @@ import {
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
+import { ArrowUpIcon, PaperclipIcon, StopIcon, MicIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
@@ -193,6 +193,62 @@ function PureMultimodalInput({
     }
   }, [status, scrollToBottom]);
 
+  // Voice input state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
+  // Start recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      mediaRecorder.onstop = handleStopRecording;
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      toast.error('Could not access microphone.');
+    }
+  };
+
+  // Stop recording
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+  };
+
+  // Handle stop recording and send to API
+  const handleStopRecording = async () => {
+    setIsTranscribing(true);
+    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'audio.webm');
+    try {
+      const response = await fetch('/api/speech-to-text', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.text) {
+        setInput((prev) => (prev ? `${prev} ${data.text}` : data.text));
+      } else {
+        toast.error(data.error || 'Transcription failed.');
+      }
+    } catch (err) {
+      toast.error('Transcription failed.');
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
   return (
     <div className="relative w-full flex flex-col gap-4">
       <AnimatePresence>
@@ -295,7 +351,22 @@ function PureMultimodalInput({
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
-      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
+      <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row gap-2 justify-end items-center">
+        {/* Microphone Button */}
+        <Button
+          type="button"
+          className="rounded-full p-1.5 h-fit border dark:border-zinc-600"
+          variant={isRecording ? 'secondary' : 'outline'}
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={isTranscribing}
+          aria-label={isRecording ? 'Stop recording' : 'Start voice input'}
+        >
+          {isTranscribing ? (
+            <span className="animate-pulse">...</span>
+          ) : (
+            <MicIcon color={isRecording ? 'red' : undefined} />
+          )}
+        </Button>
         {status === 'submitted' ? (
           <StopButton stop={stop} setMessages={setMessages} />
         ) : (
