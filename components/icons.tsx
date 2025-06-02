@@ -1173,7 +1173,10 @@ export const WarningIcon = ({ size = 16 }: { size?: number }) => {
   );
 };
 
-export const MicIcon = ({ color = 'currentColor', size = 16 }: { color?: string; size?: number }) => (
+export const MicIcon = ({
+  color = 'currentColor',
+  size = 16,
+}: { color?: string; size?: number }) => (
   <svg
     width={size}
     height={size}

@@ -187,7 +187,9 @@ export const doctors = pgTable('doctors', {
 // Appointment table
 export const appointments = pgTable('appointments', {
   id: serial('id').primaryKey(),
-  doctorId: integer('doctor_id').notNull().references(() => doctors.id),
+  doctorId: integer('doctor_id')
+    .notNull()
+    .references(() => doctors.id),
   userId: text('user_id').notNull(), // Link to your user system if needed
   time: timestamp('time').notNull(),
   status: text('status').default('booked'),
@@ -217,15 +219,21 @@ export const labTests = pgTable('lab_tests', {
   name: text('name').notNull(), // e.g., Blood Test, X-Ray
   type: text('type').notNull(), // e.g., blood, imaging
   price: integer('price').notNull(),
-  labId: integer('lab_id').notNull().references(() => labs.id),
+  labId: integer('lab_id')
+    .notNull()
+    .references(() => labs.id),
 });
 
 // Lab Bookings table
 export const labBookings = pgTable('lab_bookings', {
   id: serial('id').primaryKey(),
   userId: text('user_id').notNull(),
-  labId: integer('lab_id').notNull().references(() => labs.id),
-  labTestId: integer('lab_test_id').notNull().references(() => labTests.id),
+  labId: integer('lab_id')
+    .notNull()
+    .references(() => labs.id),
+  labTestId: integer('lab_test_id')
+    .notNull()
+    .references(() => labTests.id),
   time: timestamp('time').notNull(),
   locationType: text('location_type').notNull(), // 'home' or 'clinic'
   status: text('status').default('booked'),
@@ -245,7 +253,9 @@ export const medications = pgTable('medications', {
 // Medication Reminders table
 export const medicationReminders = pgTable('medication_reminders', {
   id: serial('id').primaryKey(),
-  medicationId: integer('medication_id').notNull().references(() => medications.id),
+  medicationId: integer('medication_id')
+    .notNull()
+    .references(() => medications.id),
   userId: text('user_id').notNull(),
   date: timestamp('date').notNull(), // Date for the reminder
   timeOfDay: text('time_of_day').notNull(), // e.g., '08:00', '20:00'
@@ -263,7 +273,9 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
 export const prescriptions = pgTable('prescriptions', {
   id: serial('id').primaryKey(),
   userId: text('user_id').notNull(),
-  doctorId: integer('doctor_id').notNull().references(() => doctors.id),
+  doctorId: integer('doctor_id')
+    .notNull()
+    .references(() => doctors.id),
   medication: text('medication').notNull(),
   dosage: text('dosage').notNull(),
   instructions: text('instructions'),

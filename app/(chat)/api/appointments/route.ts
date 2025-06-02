@@ -11,7 +11,10 @@ const db = drizzle(client);
 export async function POST(request: Request) {
   const { doctorId, userId, time } = await request.json();
   if (!doctorId || !userId || !time) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 },
+    );
   }
   const [appointment] = await db
     .insert(appointments)
@@ -51,16 +54,24 @@ export async function DELETE(request: Request) {
   }
   const { id } = await request.json();
   if (!id) {
-    return NextResponse.json({ error: 'Missing appointment id' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing appointment id' },
+      { status: 400 },
+    );
   }
   // Only allow user to cancel their own appointment
   const [updated] = await db
     .update(appointments)
     .set({ status: 'cancelled' })
-    .where(and(eq(appointments.id, id), eq(appointments.userId, session.user.id)))
+    .where(
+      and(eq(appointments.id, id), eq(appointments.userId, session.user.id)),
+    )
     .returning();
   if (!updated) {
-    return NextResponse.json({ error: 'Appointment not found or not yours' }, { status: 404 });
+    return NextResponse.json(
+      { error: 'Appointment not found or not yours' },
+      { status: 404 },
+    );
   }
   return NextResponse.json(updated);
 }
@@ -72,16 +83,24 @@ export async function PATCH(request: Request) {
   }
   const { id, newTime } = await request.json();
   if (!id || !newTime) {
-    return NextResponse.json({ error: 'Missing appointment id or new time' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing appointment id or new time' },
+      { status: 400 },
+    );
   }
   // Only allow user to reschedule their own appointment
   const [updated] = await db
     .update(appointments)
     .set({ time: new Date(newTime), status: 'rescheduled' })
-    .where(and(eq(appointments.id, id), eq(appointments.userId, session.user.id)))
+    .where(
+      and(eq(appointments.id, id), eq(appointments.userId, session.user.id)),
+    )
     .returning();
   if (!updated) {
-    return NextResponse.json({ error: 'Appointment not found or not yours' }, { status: 404 });
+    return NextResponse.json(
+      { error: 'Appointment not found or not yours' },
+      { status: 404 },
+    );
   }
   return NextResponse.json(updated);
-} 
+}

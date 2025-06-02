@@ -1,17 +1,17 @@
-"use client";
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 export default function CronDemoPage() {
   const [status, setStatus] = useState<string | null>(null);
 
   async function handleSendReminders() {
-    setStatus("Sending...");
-    const res = await fetch("/api/push/send-reminders", { method: "POST" });
+    setStatus('Sending...');
+    const res = await fetch('/api/push/send-reminders', { method: 'POST' });
     if (res.ok) {
-      setStatus("Reminders sent! (Check your device)");
+      setStatus('Reminders sent! (Check your device)');
     } else {
       const data = await res.json();
-      setStatus(`Error: ${data.error || "Unknown error"}`);
+      setStatus(`Error: ${data.error || 'Unknown error'}`);
     }
   }
 
@@ -27,4 +27,4 @@ export default function CronDemoPage() {
       {status && <div className="mt-4">{status}</div>}
     </div>
   );
-} 
+}

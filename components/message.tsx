@@ -196,17 +196,36 @@ const PurePreviewMessage = ({
                   if (toolName === 'listDoctors') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Available Doctors:</div>
+                        <div className="font-semibold mb-1">
+                          Available Doctors:
+                        </div>
                         <ul className="list-disc ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((doc: any) => (
                               <li key={doc.id} className="mb-3">
-                                <div className="font-medium">{doc.name} <span className="text-muted-foreground">({doc.specialty})</span></div>
-                                <div className="text-sm text-zinc-500">Hospital: {doc.hospital}</div>
-                                <div className="text-sm text-zinc-500">Experience: {doc.experience} years</div>
-                                <div className="text-sm text-zinc-500">Availability: {doc.availability}</div>
-                                <div className="text-sm text-zinc-500">Fees: ${doc.fees}</div>
-                                {doc.bio && <div className="text-xs text-zinc-400 mt-1">{doc.bio}</div>}
+                                <div className="font-medium">
+                                  {doc.name}{' '}
+                                  <span className="text-muted-foreground">
+                                    ({doc.specialty})
+                                  </span>
+                                </div>
+                                <div className="text-sm text-zinc-500">
+                                  Hospital: {doc.hospital}
+                                </div>
+                                <div className="text-sm text-zinc-500">
+                                  Experience: {doc.experience} years
+                                </div>
+                                <div className="text-sm text-zinc-500">
+                                  Availability: {doc.availability}
+                                </div>
+                                <div className="text-sm text-zinc-500">
+                                  Fees: ${doc.fees}
+                                </div>
+                                {doc.bio && (
+                                  <div className="text-xs text-zinc-400 mt-1">
+                                    {doc.bio}
+                                  </div>
+                                )}
                               </li>
                             ))
                           ) : (
@@ -231,14 +250,24 @@ const PurePreviewMessage = ({
                   if (toolName === 'listAppointments') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Your Upcoming Appointments:</div>
+                        <div className="font-semibold mb-1">
+                          Your Upcoming Appointments:
+                        </div>
                         <ul className="list-decimal ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((appt: any) => (
                               <li key={appt.id}>
-                                <span className="font-medium">{appt.doctor?.name}</span>{' '}
-                                <span className="text-muted-foreground">({appt.doctor?.specialty})</span>{' '}
-                                <span className="text-xs text-zinc-400">{appt.time ? new Date(appt.time).toLocaleString() : ''}</span>
+                                <span className="font-medium">
+                                  {appt.doctor?.name}
+                                </span>{' '}
+                                <span className="text-muted-foreground">
+                                  ({appt.doctor?.specialty})
+                                </span>{' '}
+                                <span className="text-xs text-zinc-400">
+                                  {appt.time
+                                    ? new Date(appt.time).toLocaleString()
+                                    : ''}
+                                </span>
                               </li>
                             ))
                           ) : (
@@ -252,7 +281,9 @@ const PurePreviewMessage = ({
                   if (toolName === 'cancelAppointment') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold">Appointment Cancelled!</div>
+                        <div className="font-semibold">
+                          Appointment Cancelled!
+                        </div>
                         <div className="text-muted-foreground text-sm">
                           Your appointment has been cancelled successfully.
                         </div>
@@ -263,10 +294,17 @@ const PurePreviewMessage = ({
                   if (toolName === 'rescheduleAppointment') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold">Appointment Rescheduled!</div>
+                        <div className="font-semibold">
+                          Appointment Rescheduled!
+                        </div>
                         <div className="text-muted-foreground text-sm">
                           Your appointment has been rescheduled to{' '}
-                          <span className="font-medium">{result.time ? new Date(result.time).toLocaleString() : ''}</span>.
+                          <span className="font-medium">
+                            {result.time
+                              ? new Date(result.time).toLocaleString()
+                              : ''}
+                          </span>
+                          .
                         </div>
                       </div>
                     );
@@ -277,7 +315,13 @@ const PurePreviewMessage = ({
                   }
 
                   if (toolName === 'bookAppointment') {
-                    return <AppointmentConfirmation key={toolCallId} time={result.time} doctor={result.doctor} />;
+                    return (
+                      <AppointmentConfirmation
+                        key={toolCallId}
+                        time={result.time}
+                        doctor={result.doctor}
+                      />
+                    );
                   }
 
                   if (toolName === 'bookAmbulance') {
@@ -285,8 +329,21 @@ const PurePreviewMessage = ({
                       <div key={toolCallId} className="my-2">
                         <div className="font-semibold">Ambulance Booked!</div>
                         <div className="text-muted-foreground text-sm">
-                          Your ambulance has been scheduled for pickup at <span className="font-medium">{result.pickupLocation}</span> to <span className="font-medium">{result.destination}</span> on{' '}
-                          <span className="font-medium">{result.time ? new Date(result.time).toLocaleString() : ''}</span>.
+                          Your ambulance has been scheduled for pickup at{' '}
+                          <span className="font-medium">
+                            {result.pickupLocation}
+                          </span>{' '}
+                          to{' '}
+                          <span className="font-medium">
+                            {result.destination}
+                          </span>{' '}
+                          on{' '}
+                          <span className="font-medium">
+                            {result.time
+                              ? new Date(result.time).toLocaleString()
+                              : ''}
+                          </span>
+                          .
                         </div>
                       </div>
                     );
@@ -295,15 +352,29 @@ const PurePreviewMessage = ({
                   if (toolName === 'listAmbulanceBookings') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Your Ambulance Bookings:</div>
+                        <div className="font-semibold mb-1">
+                          Your Ambulance Bookings:
+                        </div>
                         <ul className="list-decimal ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((booking: any) => (
                               <li key={booking.id}>
-                                <span className="font-medium">{booking.pickupLocation}</span> to{' '}
-                                <span className="font-medium">{booking.destination}</span> on{' '}
-                                <span className="text-xs text-zinc-400">{booking.time ? new Date(booking.time).toLocaleString() : ''}</span>{' '}
-                                <span className="text-muted-foreground">({booking.status})</span>
+                                <span className="font-medium">
+                                  {booking.pickupLocation}
+                                </span>{' '}
+                                to{' '}
+                                <span className="font-medium">
+                                  {booking.destination}
+                                </span>{' '}
+                                on{' '}
+                                <span className="text-xs text-zinc-400">
+                                  {booking.time
+                                    ? new Date(booking.time).toLocaleString()
+                                    : ''}
+                                </span>{' '}
+                                <span className="text-muted-foreground">
+                                  ({booking.status})
+                                </span>
                               </li>
                             ))
                           ) : (
@@ -317,24 +388,40 @@ const PurePreviewMessage = ({
                   if (toolName === 'listLabs') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Available Labs:</div>
+                        <div className="font-semibold mb-1">
+                          Available Labs:
+                        </div>
                         <ul className="list-disc ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((lab: any) => (
                               <li key={lab.id} className="mb-3">
                                 <div className="font-medium">{lab.name}</div>
-                                <div className="text-sm text-zinc-500">Address: {lab.address}</div>
-                                <div className="text-sm text-zinc-500">Time Slots: {Array.isArray(lab.timeSlots) ? lab.timeSlots.join(', ') : JSON.stringify(lab.timeSlots)}</div>
+                                <div className="text-sm text-zinc-500">
+                                  Address: {lab.address}
+                                </div>
+                                <div className="text-sm text-zinc-500">
+                                  Time Slots:{' '}
+                                  {Array.isArray(lab.timeSlots)
+                                    ? lab.timeSlots.join(', ')
+                                    : JSON.stringify(lab.timeSlots)}
+                                </div>
                                 <div className="text-sm mt-1">Tests:</div>
                                 <ul className="ml-4">
-                                  {Array.isArray(lab.tests) && lab.tests.length > 0 ? (
+                                  {Array.isArray(lab.tests) &&
+                                  lab.tests.length > 0 ? (
                                     lab.tests.map((test: any) => (
-                                      <li key={test.id} className="text-xs text-zinc-600">
-                                        {test.name} ({test.type}) - ${test.price}
+                                      <li
+                                        key={test.id}
+                                        className="text-xs text-zinc-600"
+                                      >
+                                        {test.name} ({test.type}) - $
+                                        {test.price}
                                       </li>
                                     ))
                                   ) : (
-                                    <li className="text-xs text-zinc-400">No tests available.</li>
+                                    <li className="text-xs text-zinc-400">
+                                      No tests available.
+                                    </li>
                                   )}
                                 </ul>
                               </li>
@@ -352,8 +439,18 @@ const PurePreviewMessage = ({
                       <div key={toolCallId} className="my-2">
                         <div className="font-semibold">Lab Test Booked!</div>
                         <div className="text-muted-foreground text-sm">
-                          Your {result.test?.name} ({result.test?.type}) test has been scheduled at <span className="font-medium">{result.lab?.name}</span> ({result.lab?.address}) for{' '}
-                          <span className="font-medium">{result.time ? new Date(result.time).toLocaleString() : ''}</span> ({result.locationType}).
+                          Your {result.test?.name} ({result.test?.type}) test
+                          has been scheduled at{' '}
+                          <span className="font-medium">
+                            {result.lab?.name}
+                          </span>{' '}
+                          ({result.lab?.address}) for{' '}
+                          <span className="font-medium">
+                            {result.time
+                              ? new Date(result.time).toLocaleString()
+                              : ''}
+                          </span>{' '}
+                          ({result.locationType}).
                         </div>
                       </div>
                     );
@@ -362,13 +459,30 @@ const PurePreviewMessage = ({
                   if (toolName === 'listLabBookings') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Your Lab Test Bookings:</div>
+                        <div className="font-semibold mb-1">
+                          Your Lab Test Bookings:
+                        </div>
                         <ul className="list-decimal ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((booking: any) => (
                               <li key={booking.id}>
-                                <span className="font-medium">{booking.test?.name}</span> ({booking.test?.type}) at <span className="font-medium">{booking.lab?.name}</span> on{' '}
-                                <span className="text-xs text-zinc-400">{booking.time ? new Date(booking.time).toLocaleString() : ''}</span> ({booking.locationType}) <span className="text-muted-foreground">({booking.status})</span>
+                                <span className="font-medium">
+                                  {booking.test?.name}
+                                </span>{' '}
+                                ({booking.test?.type}) at{' '}
+                                <span className="font-medium">
+                                  {booking.lab?.name}
+                                </span>{' '}
+                                on{' '}
+                                <span className="text-xs text-zinc-400">
+                                  {booking.time
+                                    ? new Date(booking.time).toLocaleString()
+                                    : ''}
+                                </span>{' '}
+                                ({booking.locationType}){' '}
+                                <span className="text-muted-foreground">
+                                  ({booking.status})
+                                </span>
                               </li>
                             ))
                           ) : (
@@ -382,7 +496,9 @@ const PurePreviewMessage = ({
                   if (toolName === 'cancelLabBooking') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold">Lab Booking Cancelled!</div>
+                        <div className="font-semibold">
+                          Lab Booking Cancelled!
+                        </div>
                         <div className="text-muted-foreground text-sm">
                           Your lab test booking has been cancelled successfully.
                         </div>
@@ -395,7 +511,9 @@ const PurePreviewMessage = ({
                       <div key={toolCallId} className="my-2">
                         <div className="font-semibold">Medication Added!</div>
                         <div className="text-muted-foreground text-sm">
-                          Your medication <span className="font-medium">{result.name}</span> ({result.dosage}) has been added with reminders.
+                          Your medication{' '}
+                          <span className="font-medium">{result.name}</span> (
+                          {result.dosage}) has been added with reminders.
                         </div>
                       </div>
                     );
@@ -404,14 +522,34 @@ const PurePreviewMessage = ({
                   if (toolName === 'listMedications') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Your Medications:</div>
+                        <div className="font-semibold mb-1">
+                          Your Medications:
+                        </div>
                         <ul className="list-disc ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((med: any) => (
                               <li key={med.id}>
-                                <span className="font-medium">{med.name}</span> ({med.dosage})
-                                {med.notes && <span className="text-xs text-zinc-400"> — {med.notes}</span>}
-                                <span className="text-xs text-zinc-400"> (from {med.startDate ? new Date(med.startDate).toLocaleDateString() : ''}{med.endDate ? ` to ${new Date(med.endDate).toLocaleDateString()}` : ''})</span>
+                                <span className="font-medium">{med.name}</span>{' '}
+                                ({med.dosage})
+                                {med.notes && (
+                                  <span className="text-xs text-zinc-400">
+                                    {' '}
+                                    — {med.notes}
+                                  </span>
+                                )}
+                                <span className="text-xs text-zinc-400">
+                                  {' '}
+                                  (from{' '}
+                                  {med.startDate
+                                    ? new Date(
+                                        med.startDate,
+                                      ).toLocaleDateString()
+                                    : ''}
+                                  {med.endDate
+                                    ? ` to ${new Date(med.endDate).toLocaleDateString()}`
+                                    : ''}
+                                  )
+                                </span>
                               </li>
                             ))
                           ) : (
@@ -425,12 +563,26 @@ const PurePreviewMessage = ({
                   if (toolName === 'listMedicationReminders') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold mb-1">Your Medication Reminders:</div>
+                        <div className="font-semibold mb-1">
+                          Your Medication Reminders:
+                        </div>
                         <ul className="list-decimal ml-6">
                           {Array.isArray(result) && result.length > 0 ? (
                             result.map((rem: any) => (
                               <li key={rem.id}>
-                                <span className="font-medium">{rem.timeOfDay}</span> on <span className="text-xs text-zinc-400">{rem.date ? new Date(rem.date).toLocaleDateString() : ''}</span> — <span className="text-muted-foreground">{rem.status}</span>
+                                <span className="font-medium">
+                                  {rem.timeOfDay}
+                                </span>{' '}
+                                on{' '}
+                                <span className="text-xs text-zinc-400">
+                                  {rem.date
+                                    ? new Date(rem.date).toLocaleDateString()
+                                    : ''}
+                                </span>{' '}
+                                —{' '}
+                                <span className="text-muted-foreground">
+                                  {rem.status}
+                                </span>
                               </li>
                             ))
                           ) : (
@@ -444,23 +596,28 @@ const PurePreviewMessage = ({
                   if (toolName === 'markMedicationReminder') {
                     return (
                       <div key={toolCallId} className="my-2">
-                        <div className="font-semibold">Medication Reminder Updated!</div>
+                        <div className="font-semibold">
+                          Medication Reminder Updated!
+                        </div>
                         <div className="text-muted-foreground text-sm">
-                          This reminder has been marked as <span className="font-medium">{result.status}</span>.
+                          This reminder has been marked as{' '}
+                          <span className="font-medium">{result.status}</span>.
                         </div>
                       </div>
                     );
                   }
 
-                  if ([
-                    'listDoctors',
-                    'bookAppointment',
-                    'listAppointments',
-                    'getWeather',
-                    'createDocument',
-                    'updateDocument',
-                    'requestSuggestions',
-                  ].includes(toolName)) {
+                  if (
+                    [
+                      'listDoctors',
+                      'bookAppointment',
+                      'listAppointments',
+                      'getWeather',
+                      'createDocument',
+                      'updateDocument',
+                      'requestSuggestions',
+                    ].includes(toolName)
+                  ) {
                     return null;
                   }
 

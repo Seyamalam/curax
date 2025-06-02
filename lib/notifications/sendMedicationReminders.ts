@@ -1,6 +1,10 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { medicationReminders, medications, pushSubscriptions } from '../db/schema';
+import {
+  medicationReminders,
+  medications,
+  pushSubscriptions,
+} from '../db/schema';
 import { eq, and } from 'drizzle-orm';
 import { setVapidDetails, sendNotification } from 'web-push';
 
@@ -10,7 +14,7 @@ const db = drizzle(client);
 setVapidDetails(
   'mailto:your-email@example.com',
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
+  process.env.VAPID_PRIVATE_KEY!,
 );
 
 export async function sendDueMedicationReminders() {
@@ -29,11 +33,13 @@ export async function sendDueMedicationReminders() {
       status: medicationReminders.status,
     })
     .from(medicationReminders)
-    .where(and(
-      eq(medicationReminders.status, 'pending'),
-      eq(medicationReminders.date, new Date(nowDate)),
-      eq(medicationReminders.timeOfDay, nowTime)
-    ));
+    .where(
+      and(
+        eq(medicationReminders.status, 'pending'),
+        eq(medicationReminders.date, new Date(nowDate)),
+        eq(medicationReminders.timeOfDay, nowTime),
+      ),
+    );
 
   for (const reminder of reminders) {
     // Get medication info
@@ -61,7 +67,7 @@ export async function sendDueMedicationReminders() {
             title: 'Medication Reminder',
             body: `Time to take your medication: ${med.name} (${med.dosage})`,
             icon: '/icon-192.png',
-          })
+          }),
         );
       } catch (err) {
         console.error('Push notification error:', err);
@@ -70,4 +76,4 @@ export async function sendDueMedicationReminders() {
     // Optionally, mark the reminder as 'notified' or similar
     // await db.update(medicationReminders).set({ status: 'notified' }).where(eq(medicationReminders.id, reminder.id));
   }
-} 
+}
