@@ -36,7 +36,17 @@ import {
 import { after } from 'next/server';
 import type { Chat } from '@/lib/db/schema';
 import { z } from 'zod';
-import { doctors, appointments, ambulanceBookings, labs, labTests, labBookings, medications, medicationReminders, prescriptions } from '@/lib/db/schema';
+import {
+  doctors,
+  appointments,
+  ambulanceBookings,
+  labs,
+  labTests,
+  labBookings,
+  medications,
+  medicationReminders,
+  prescriptions,
+} from '@/lib/db/schema';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { eq, and } from 'drizzle-orm';
@@ -72,16 +82,18 @@ const listDoctors = tool({
   description: 'List all available doctors and their specialties',
   parameters: z.object({}),
   execute: async () => {
-    const allDoctors = await db.select({
-      id: doctors.id,
-      name: doctors.name,
-      specialty: doctors.specialty,
-      hospital: doctors.hospital,
-      experience: doctors.experience,
-      availability: doctors.availability,
-      fees: doctors.fees,
-      bio: doctors.bio,
-    }).from(doctors);
+    const allDoctors = await db
+      .select({
+        id: doctors.id,
+        name: doctors.name,
+        specialty: doctors.specialty,
+        hospital: doctors.hospital,
+        experience: doctors.experience,
+        availability: doctors.availability,
+        fees: doctors.fees,
+        bio: doctors.bio,
+      })
+      .from(doctors);
     return allDoctors;
   },
 });
@@ -95,27 +107,33 @@ const doctorDetails = tool({
   execute: async ({ doctorId, name }) => {
     let doctor;
     if (doctorId) {
-      doctor = await db.select({
-        id: doctors.id,
-        name: doctors.name,
-        specialty: doctors.specialty,
-        hospital: doctors.hospital,
-        experience: doctors.experience,
-        availability: doctors.availability,
-        fees: doctors.fees,
-        bio: doctors.bio,
-      }).from(doctors).where(eq(doctors.id, doctorId));
+      doctor = await db
+        .select({
+          id: doctors.id,
+          name: doctors.name,
+          specialty: doctors.specialty,
+          hospital: doctors.hospital,
+          experience: doctors.experience,
+          availability: doctors.availability,
+          fees: doctors.fees,
+          bio: doctors.bio,
+        })
+        .from(doctors)
+        .where(eq(doctors.id, doctorId));
     } else if (name) {
-      doctor = await db.select({
-        id: doctors.id,
-        name: doctors.name,
-        specialty: doctors.specialty,
-        hospital: doctors.hospital,
-        experience: doctors.experience,
-        availability: doctors.availability,
-        fees: doctors.fees,
-        bio: doctors.bio,
-      }).from(doctors).where(eq(doctors.name, name));
+      doctor = await db
+        .select({
+          id: doctors.id,
+          name: doctors.name,
+          specialty: doctors.specialty,
+          hospital: doctors.hospital,
+          experience: doctors.experience,
+          availability: doctors.availability,
+          fees: doctors.fees,
+          bio: doctors.bio,
+        })
+        .from(doctors)
+        .where(eq(doctors.name, name));
     }
     if (!doctor || doctor.length === 0) {
       throw new Error('Doctor not found');
@@ -143,22 +161,26 @@ const bookAppointment = tool({
       throw new Error('Failed to book appointment');
     }
     // Fetch doctor details for confirmation
-    const doctor = await db.select({
-      id: doctors.id,
-      name: doctors.name,
-      specialty: doctors.specialty,
-      hospital: doctors.hospital,
-      experience: doctors.experience,
-      availability: doctors.availability,
-      fees: doctors.fees,
-      bio: doctors.bio,
-    }).from(doctors).where(eq(doctors.id, doctorId));
+    const doctor = await db
+      .select({
+        id: doctors.id,
+        name: doctors.name,
+        specialty: doctors.specialty,
+        hospital: doctors.hospital,
+        experience: doctors.experience,
+        availability: doctors.availability,
+        fees: doctors.fees,
+        bio: doctors.bio,
+      })
+      .from(doctors)
+      .where(eq(doctors.id, doctorId));
     return { ...appointment, doctor: doctor[0] };
   },
 });
 
 const listAppointments = tool({
-  description: 'List all upcoming appointments for the current user, including doctor details',
+  description:
+    'List all upcoming appointments for the current user, including doctor details',
   parameters: z.object({}),
   execute: async () => {
     const session = await auth();
@@ -194,7 +216,12 @@ const cancelAppointment = tool({
     const [updated] = await db
       .update(appointments)
       .set({ status: 'cancelled' })
-      .where(and(eq(appointments.id, appointmentId), eq(appointments.userId, session.user.id)))
+      .where(
+        and(
+          eq(appointments.id, appointmentId),
+          eq(appointments.userId, session.user.id),
+        ),
+      )
       .returning();
     if (!updated) {
       throw new Error('Appointment not found or not yours');
@@ -205,7 +232,10 @@ const cancelAppointment = tool({
 
 const rescheduleAppointment = tool({
   description: 'Reschedule an appointment by its ID and new time',
-  parameters: z.object({ appointmentId: z.number(), newTime: z.string().describe('New appointment time in ISO format') }),
+  parameters: z.object({
+    appointmentId: z.number(),
+    newTime: z.string().describe('New appointment time in ISO format'),
+  }),
   execute: async ({ appointmentId, newTime }) => {
     const session = await auth();
     if (!session?.user?.id) {
@@ -214,7 +244,12 @@ const rescheduleAppointment = tool({
     const [updated] = await db
       .update(appointments)
       .set({ time: new Date(newTime), status: 'rescheduled' })
-      .where(and(eq(appointments.id, appointmentId), eq(appointments.userId, session.user.id)))
+      .where(
+        and(
+          eq(appointments.id, appointmentId),
+          eq(appointments.userId, session.user.id),
+        ),
+      )
       .returning();
     if (!updated) {
       throw new Error('Appointment not found or not yours');
@@ -284,7 +319,12 @@ const cancelAmbulanceBooking = tool({
     const [updated] = await db
       .update(ambulanceBookings)
       .set({ status: 'cancelled' })
-      .where(and(eq(ambulanceBookings.id, bookingId), eq(ambulanceBookings.userId, session.user.id)))
+      .where(
+        and(
+          eq(ambulanceBookings.id, bookingId),
+          eq(ambulanceBookings.userId, session.user.id),
+        ),
+      )
       .returning();
     if (!updated) {
       throw new Error('Ambulance booking not found or not yours');
@@ -298,23 +338,28 @@ const listLabs = tool({
   parameters: z.object({}),
   execute: async () => {
     // Get all labs
-    const allLabs = await db.select({
-      id: labs.id,
-      name: labs.name,
-      address: labs.address,
-      timeSlots: labs.timeSlots,
-    }).from(labs);
+    const allLabs = await db
+      .select({
+        id: labs.id,
+        name: labs.name,
+        address: labs.address,
+        timeSlots: labs.timeSlots,
+      })
+      .from(labs);
     // For each lab, get its tests
     const labsWithTests = await Promise.all(
       allLabs.map(async (lab) => {
-        const tests = await db.select({
-          id: labTests.id,
-          name: labTests.name,
-          type: labTests.type,
-          price: labTests.price,
-        }).from(labTests).where(eq(labTests.labId, lab.id));
+        const tests = await db
+          .select({
+            id: labTests.id,
+            name: labTests.name,
+            type: labTests.type,
+            price: labTests.price,
+          })
+          .from(labTests)
+          .where(eq(labTests.labId, lab.id));
         return { ...lab, tests };
-      })
+      }),
     );
     return labsWithTests;
   },
@@ -347,17 +392,23 @@ const bookLabTest = tool({
       throw new Error('Failed to book lab test');
     }
     // Fetch lab and test details for confirmation
-    const [lab] = await db.select({
-      id: labs.id,
-      name: labs.name,
-      address: labs.address,
-    }).from(labs).where(eq(labs.id, labId));
-    const [test] = await db.select({
-      id: labTests.id,
-      name: labTests.name,
-      type: labTests.type,
-      price: labTests.price,
-    }).from(labTests).where(eq(labTests.id, labTestId));
+    const [lab] = await db
+      .select({
+        id: labs.id,
+        name: labs.name,
+        address: labs.address,
+      })
+      .from(labs)
+      .where(eq(labs.id, labId));
+    const [test] = await db
+      .select({
+        id: labTests.id,
+        name: labTests.name,
+        type: labTests.type,
+        price: labTests.price,
+      })
+      .from(labTests)
+      .where(eq(labTests.id, labTestId));
     return { ...booking, lab, test };
   },
 });
@@ -405,7 +456,12 @@ const cancelLabBooking = tool({
     const [updated] = await db
       .update(labBookings)
       .set({ status: 'cancelled' })
-      .where(and(eq(labBookings.id, bookingId), eq(labBookings.userId, session.user.id)))
+      .where(
+        and(
+          eq(labBookings.id, bookingId),
+          eq(labBookings.userId, session.user.id),
+        ),
+      )
       .returning();
     if (!updated) {
       throw new Error('Lab booking not found or not yours');
@@ -422,24 +478,29 @@ const addMedication = tool({
     notes: z.string().optional(),
     startDate: z.string().describe('Start date in ISO format'),
     endDate: z.string().optional().describe('End date in ISO format'),
-    reminders: z.array(z.object({
-      date: z.string().describe('Date in ISO format'),
-      timeOfDay: z.string().describe('Time of day, e.g., 08:00'),
-    })),
+    reminders: z.array(
+      z.object({
+        date: z.string().describe('Date in ISO format'),
+        timeOfDay: z.string().describe('Time of day, e.g., 08:00'),
+      }),
+    ),
   }),
   execute: async ({ name, dosage, notes, startDate, endDate, reminders }) => {
     const session = await auth();
     if (!session?.user?.id) {
       throw new Error('User not authenticated');
     }
-    const [med] = await db.insert(medications).values({
-      userId: session.user.id,
-      name,
-      dosage,
-      notes,
-      startDate: new Date(startDate),
-      endDate: endDate ? new Date(endDate) : null,
-    }).returning();
+    const [med] = await db
+      .insert(medications)
+      .values({
+        userId: session.user.id,
+        name,
+        dosage,
+        notes,
+        startDate: new Date(startDate),
+        endDate: endDate ? new Date(endDate) : null,
+      })
+      .returning();
     if (!med) throw new Error('Failed to add medication');
     // Insert reminders
     for (const r of reminders) {
@@ -462,14 +523,17 @@ const listMedications = tool({
     if (!session?.user?.id) {
       throw new Error('User not authenticated');
     }
-    return await db.select({
-      id: medications.id,
-      name: medications.name,
-      dosage: medications.dosage,
-      notes: medications.notes,
-      startDate: medications.startDate,
-      endDate: medications.endDate,
-    }).from(medications).where(eq(medications.userId, session.user.id));
+    return await db
+      .select({
+        id: medications.id,
+        name: medications.name,
+        dosage: medications.dosage,
+        notes: medications.notes,
+        startDate: medications.startDate,
+        endDate: medications.endDate,
+      })
+      .from(medications)
+      .where(eq(medications.userId, session.user.id));
   },
 });
 
@@ -481,27 +545,39 @@ const listMedicationReminders = tool({
     if (!session?.user?.id) {
       throw new Error('User not authenticated');
     }
-    return await db.select({
-      id: medicationReminders.id,
-      medicationId: medicationReminders.medicationId,
-      date: medicationReminders.date,
-      timeOfDay: medicationReminders.timeOfDay,
-      status: medicationReminders.status,
-    }).from(medicationReminders).where(eq(medicationReminders.userId, session.user.id));
+    return await db
+      .select({
+        id: medicationReminders.id,
+        medicationId: medicationReminders.medicationId,
+        date: medicationReminders.date,
+        timeOfDay: medicationReminders.timeOfDay,
+        status: medicationReminders.status,
+      })
+      .from(medicationReminders)
+      .where(eq(medicationReminders.userId, session.user.id));
   },
 });
 
 const markMedicationReminder = tool({
   description: 'Mark a medication reminder as taken or missed',
-  parameters: z.object({ reminderId: z.number(), status: z.enum(['taken', 'missed']) }),
+  parameters: z.object({
+    reminderId: z.number(),
+    status: z.enum(['taken', 'missed']),
+  }),
   execute: async ({ reminderId, status }) => {
     const session = await auth();
     if (!session?.user?.id) {
       throw new Error('User not authenticated');
     }
-    const [updated] = await db.update(medicationReminders)
+    const [updated] = await db
+      .update(medicationReminders)
       .set({ status })
-      .where(and(eq(medicationReminders.id, reminderId), eq(medicationReminders.userId, session.user.id)))
+      .where(
+        and(
+          eq(medicationReminders.id, reminderId),
+          eq(medicationReminders.userId, session.user.id),
+        ),
+      )
       .returning();
     if (!updated) throw new Error('Reminder not found or not yours');
     return updated;
@@ -524,10 +600,22 @@ const requestPrescriptionRefill = tool({
         status: prescriptions.status,
       })
       .from(prescriptions)
-      .where(and(eq(prescriptions.id, prescriptionId), eq(prescriptions.userId, session.user.id)));
+      .where(
+        and(
+          eq(prescriptions.id, prescriptionId),
+          eq(prescriptions.userId, session.user.id),
+        ),
+      );
     if (!prescription) throw new Error('Prescription not found');
-    if (!prescription.refillable || prescription.refillsRemaining === null || prescription.refillsRemaining <= 0 || prescription.status !== 'active') {
-      throw new Error('Prescription is not refillable, has no refills remaining, or is invalid');
+    if (
+      !prescription.refillable ||
+      prescription.refillsRemaining === null ||
+      prescription.refillsRemaining <= 0 ||
+      prescription.status !== 'active'
+    ) {
+      throw new Error(
+        'Prescription is not refillable, has no refills remaining, or is invalid',
+      );
     }
     // Decrement refillsRemaining
     const [updated] = await db
@@ -545,19 +633,22 @@ const listPrescriptions = tool({
   execute: async () => {
     const session = await auth();
     if (!session?.user?.id) throw new Error('User not authenticated');
-    return await db.select({
-      id: prescriptions.id,
-      doctorId: prescriptions.doctorId,
-      medication: prescriptions.medication,
-      dosage: prescriptions.dosage,
-      instructions: prescriptions.instructions,
-      issuedAt: prescriptions.issuedAt,
-      expiresAt: prescriptions.expiresAt,
-      refillable: prescriptions.refillable,
-      refillsRemaining: prescriptions.refillsRemaining,
-      fileUrl: prescriptions.fileUrl,
-      status: prescriptions.status,
-    }).from(prescriptions).where(eq(prescriptions.userId, session.user.id));
+    return await db
+      .select({
+        id: prescriptions.id,
+        doctorId: prescriptions.doctorId,
+        medication: prescriptions.medication,
+        dosage: prescriptions.dosage,
+        instructions: prescriptions.instructions,
+        issuedAt: prescriptions.issuedAt,
+        expiresAt: prescriptions.expiresAt,
+        refillable: prescriptions.refillable,
+        refillsRemaining: prescriptions.refillsRemaining,
+        fileUrl: prescriptions.fileUrl,
+        status: prescriptions.status,
+      })
+      .from(prescriptions)
+      .where(eq(prescriptions.userId, session.user.id));
   },
 });
 
@@ -570,8 +661,14 @@ const downloadPrescription = tool({
     const [prescription] = await db
       .select({ fileUrl: prescriptions.fileUrl })
       .from(prescriptions)
-      .where(and(eq(prescriptions.id, prescriptionId), eq(prescriptions.userId, session.user.id)));
-    if (!prescription || !prescription.fileUrl) throw new Error('Prescription file not found');
+      .where(
+        and(
+          eq(prescriptions.id, prescriptionId),
+          eq(prescriptions.userId, session.user.id),
+        ),
+      );
+    if (!prescription || !prescription.fileUrl)
+      throw new Error('Prescription file not found');
     return { url: prescription.fileUrl };
   },
 });

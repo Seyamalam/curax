@@ -31,11 +31,14 @@ async function seedLabsAndTests() {
   // Insert labs and get their IDs
   const insertedLabs = [];
   for (const lab of labData) {
-    const [inserted] = await db.insert(labs).values({
-      name: lab.name,
-      address: lab.address,
-      timeSlots: lab.timeSlots,
-    }).returning();
+    const [inserted] = await db
+      .insert(labs)
+      .values({
+        name: lab.name,
+        address: lab.address,
+        timeSlots: lab.timeSlots,
+      })
+      .returning();
     insertedLabs.push(inserted);
   }
 
@@ -53,7 +56,6 @@ async function seedLabsAndTests() {
       { name: 'Stress Test', type: 'electrocardiogram', price: 100 },
       { name: 'Echocardiogram', type: 'echocardiogram', price: 150 },
       { name: 'Holter Monitor', type: 'electrocardiogram', price: 120 },
-      
     ],
     // For Health Diagnostics
     [
@@ -65,7 +67,6 @@ async function seedLabsAndTests() {
       { name: 'Ultrasound', type: 'imaging', price: 150 },
       { name: 'EKG', type: 'electrocardiogram', price: 80 },
       { name: 'Stress Test', type: 'electrocardiogram', price: 100 },
-      
     ],
   ];
 
@@ -87,4 +88,4 @@ async function seedLabsAndTests() {
 seedLabsAndTests().catch((err) => {
   console.error(err);
   process.exit(1);
-}); 
+});

@@ -1,6 +1,11 @@
 import React from 'react';
 import { Card } from './ui/card';
-import { FaHospitalSymbol, FaUserMd, FaRegClock, FaMoneyBillWave } from 'react-icons/fa';
+import {
+  FaHospitalSymbol,
+  FaUserMd,
+  FaRegClock,
+  FaMoneyBillWave,
+} from 'react-icons/fa';
 
 export interface DoctorCardProps {
   id: number;
@@ -50,8 +55,10 @@ export const DoctorCard: React.FC<DoctorCardProps> = ({
           <FaRegClock className="text-cyan-300" />
           <span className="text-cyan-100">Available: {availability}</span>
         </div>
-        <button className="bg-cyan-500 hover:bg-cyan-400 text-blue-900 font-semibold rounded-full px-4 py-1 text-xs transition">More Info</button>
+        <button className="bg-cyan-500 hover:bg-cyan-400 text-blue-900 font-semibold rounded-full px-4 py-1 text-xs transition">
+          More Info
+        </button>
       </div>
     </div>
   </Card>
-); 
+);

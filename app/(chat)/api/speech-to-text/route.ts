@@ -9,7 +9,10 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const audioFile = formData.get('audio');
     if (!audioFile || !(audioFile instanceof Blob)) {
-      return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'No audio file provided' },
+        { status: 400 },
+      );
     }
 
     // Prepare form data for Groq API
@@ -21,13 +24,16 @@ export async function POST(req: NextRequest) {
     groqForm.append('temperature', '0');
 
     // Call Groq API
-    const groqRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+    const groqRes = await fetch(
+      'https://api.groq.com/openai/v1/audio/transcriptions',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: groqForm,
       },
-      body: groqForm,
-    });
+    );
 
     if (!groqRes.ok) {
       const err = await groqRes.text();
@@ -37,6 +43,9 @@ export async function POST(req: NextRequest) {
     const data = await groqRes.json();
     return NextResponse.json({ text: data.text });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Transcription failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Transcription failed' },
+      { status: 500 },
+    );
   }
-} 
+}
