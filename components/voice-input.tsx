@@ -223,8 +223,7 @@ const VoiceTrigger = React.forwardRef<
       {...props}
     >
       {children || (
-        <>
-          {isTranscribing ? (
+        isTranscribing ? (
             <div
               className="pointer-events-auto size-6 animate-spin cursor-pointer rounded-sm bg-black dark:bg-white"
               style={{ animationDuration: '3s' }}
@@ -233,8 +232,7 @@ const VoiceTrigger = React.forwardRef<
             <div className="size-6 animate-pulse rounded-full bg-red-500" />
           ) : (
             <Mic className="size-5 text-black/70 dark:text-white/70" />
-          )}
-        </>
+          )
       )}
     </Button>
   );

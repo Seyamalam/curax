@@ -1,13 +1,13 @@
 'use client';
 
-import { UseChatHelpers } from '@ai-sdk/react';
-import { Attachment } from 'ai';
+import type { UseChatHelpers } from '@ai-sdk/react';
+import type { Attachment } from 'ai';
 import { cx } from 'class-variance-authority';
 import {
-  Dispatch,
+  type Dispatch,
   memo,
-  RefObject,
-  SetStateAction,
+  type RefObject,
+  type SetStateAction,
   useCallback,
   useEffect,
   useRef,
