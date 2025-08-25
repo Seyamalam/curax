@@ -18,7 +18,8 @@
     "db:check": "drizzle-kit check",
     "db:up": "drizzle-kit up",
     "test": "export PLAYWRIGHT=True && pnpm exec playwright test",
-    "seed": "bun run lib/db/seed.ts"
+    "seed": "bun run lib/db/seed.ts",
+    "seed-labs": "bun run lib/db/seed-labs.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^1.2.9",

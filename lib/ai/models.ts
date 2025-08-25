@@ -9,17 +9,17 @@ export interface ChatModel {
 export const chatModels: Array<ChatModel> = [
   {
     id: 'chat-model',
-    name: 'Gemini 2.5 Flash',
-    description: 'Google Gemini 2.5 Flash Preview (for general chat)',
+    name: 'GPT-4.1 Nano',
+    description: 'OpenAI GPT-4.1 Nano (for general chat)',
   },
   {
     id: 'chat-model-reasoning',
-    name: 'Gemini 2.5 Flash (Thinking)',
-    description: 'Google Gemini 2.5 Flash Preview (for advanced reasoning)',
+    name: 'GPT-5 Nano (Thinking)',
+    description: 'OpenAI GPT-5 Nano (for advanced reasoning)',
   },
   {
     id: 'groq-llama4',
-    name: 'Groq Llama 4 Scout',
-    description: 'Meta Llama 4 Scout 17B 16E Instruct (Groq)',
+    name: 'GPT-OSS-20B',
+    description: 'OpenAI GPT-OSS-20B (via Groq)',
   },
 ];

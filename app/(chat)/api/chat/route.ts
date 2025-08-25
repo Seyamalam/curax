@@ -24,6 +24,9 @@ import { createDocument } from '@/lib/ai/tools/create-document';
 import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
+import { analyzeSymptoms } from '@/lib/ai/tools/analyze-symptoms';
+import { checkMedicationInteractions } from '@/lib/ai/tools/check-medication-interactions';
+import { emergencyCoordination } from '@/lib/ai/tools/emergency-coordination';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
@@ -776,6 +779,9 @@ export async function POST(request: Request) {
                   'createDocument',
                   'updateDocument',
                   'requestSuggestions',
+                  'analyzeSymptoms',
+                  'checkMedicationInteractions',
+                  'emergencyCoordination',
                   'listDoctors',
                   'doctorDetails',
                   'bookAppointment',
@@ -807,6 +813,10 @@ export async function POST(request: Request) {
               session,
               dataStream,
             }),
+            analyzeSymptoms: analyzeSymptoms({ session }),
+            checkMedicationInteractions: checkMedicationInteractions({
+              session,
+            }),
             listDoctors,
             doctorDetails,
             bookAppointment,
@@ -827,6 +837,7 @@ export async function POST(request: Request) {
             requestPrescriptionRefill,
             listPrescriptions,
             downloadPrescription,
+            emergencyCoordination: emergencyCoordination({ session }),
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
@@ -890,10 +901,14 @@ export async function POST(request: Request) {
     } else {
       return new Response(stream);
     }
-  } catch (_) {
-    return new Response('An error occurred while processing your request!', {
-      status: 500,
-    });
+  } catch (error) {
+    console.error('Chat API Error:', error);
+    return new Response(
+      `An error occurred while processing your request: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      {
+        status: 500,
+      },
+    );
   }
 }
 
