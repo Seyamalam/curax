@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "dev:pwa": "next dev --experimental-https",
-    "build": "tsx lib/db/migrate && bun run lib/db/seed && next build",
+    "build": "bun run lib/db/seed && next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
     "lint:fix": "next lint --fix && biome lint --write --unsafe",

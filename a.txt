@@ -1,0 +1,111 @@
+[02:17:25.621] Detected Next.js version: 15.3.2
+[02:17:25.677] Running "pnpm run build"
+[02:17:26.385] 
+[02:17:26.386] > ai-chatbot@3.0.19 build /vercel/path0
+[02:17:26.386] > tsx lib/db/migrate && bun run lib/db/seed && next build
+[02:17:26.386] 
+[02:17:28.002] ⏳ Running migrations...
+[02:17:30.376] {
+[02:17:30.376]   severity_local: 'NOTICE',
+[02:17:30.376]   severity: 'NOTICE',
+[02:17:30.376]   code: '42P07',
+[02:17:30.376]   message: 'relation "Chat" already exists, skipping',
+[02:17:30.376]   file: 'parse_utilcmd.c',
+[02:17:30.376]   line: '207',
+[02:17:30.376]   routine: 'transformCreateStmt'
+[02:17:30.376] }
+[02:17:30.597] {
+[02:17:30.598]   severity_local: 'NOTICE',
+[02:17:30.598]   severity: 'NOTICE',
+[02:17:30.598]   code: '42P07',
+[02:17:30.598]   message: 'relation "User" already exists, skipping',
+[02:17:30.598]   file: 'parse_utilcmd.c',
+[02:17:30.598]   line: '207',
+[02:17:30.598]   routine: 'transformCreateStmt'
+[02:17:30.598] }
+[02:17:31.484] {
+[02:17:31.484]   severity_local: 'NOTICE',
+[02:17:31.484]   severity: 'NOTICE',
+[02:17:31.484]   code: '42P07',
+[02:17:31.484]   message: 'relation "Suggestion" already exists, skipping',
+[02:17:31.484]   file: 'parse_utilcmd.c',
+[02:17:31.484]   line: '207',
+[02:17:31.484]   routine: 'transformCreateStmt'
+[02:17:31.484] }
+[02:17:31.705] {
+[02:17:31.706]   severity_local: 'NOTICE',
+[02:17:31.706]   severity: 'NOTICE',
+[02:17:31.706]   code: '42P07',
+[02:17:31.706]   message: 'relation "Document" already exists, skipping',
+[02:17:31.706]   file: 'parse_utilcmd.c',
+[02:17:31.706]   line: '207',
+[02:17:31.707]   routine: 'transformCreateStmt'
+[02:17:31.707] }
+[02:17:32.148] {
+[02:17:32.148]   severity_local: 'NOTICE',
+[02:17:32.149]   severity: 'NOTICE',
+[02:17:32.149]   code: '42622',
+[02:17:32.149]   message: 'identifier "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_fk" will be truncated to "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_f"',
+[02:17:32.149]   where: 'compilation of PL/pgSQL function "inline_code_block" near line 1',
+[02:17:32.149]   file: 'scansup.c',
+[02:17:32.150]   line: '99',
+[02:17:32.150]   routine: 'truncate_identifier'
+[02:17:32.150] }
+[02:17:32.150] {
+[02:17:32.150]   severity_local: 'NOTICE',
+[02:17:32.150]   severity: 'NOTICE',
+[02:17:32.150]   code: '42622',
+[02:17:32.150]   message: 'identifier "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_fk" will be truncated to "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_f"',
+[02:17:32.150]   position: '15',
+[02:17:32.150]   file: 'scansup.c',
+[02:17:32.150]   line: '99',
+[02:17:32.151]   routine: 'truncate_identifier'
+[02:17:32.151] }
+[02:17:32.151] {
+[02:17:32.151]   severity_local: 'NOTICE',
+[02:17:32.151]   severity: 'NOTICE',
+[02:17:32.151]   code: '42622',
+[02:17:32.151]   message: 'identifier "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_fk" will be truncated to "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_f"',
+[02:17:32.151]   where: 'SQL statement "ALTER TABLE "Suggestion" ADD CONSTRAINT "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_fk" FOREIGN KEY ("documentId","documentCreatedAt") REFERENCES "public"."Document"("id","createdAt") ON DELETE no action ON UPDATE no action"\n' +
+[02:17:32.151]     'PL/pgSQL function inline_code_block line 2 at SQL statement',
+[02:17:32.151]   file: 'scansup.c',
+[02:17:32.151]   line: '99',
+[02:17:32.151]   routine: 'truncate_identifier'
+[02:17:32.151] }
+[02:17:33.033] {
+[02:17:33.033]   severity_local: 'NOTICE',
+[02:17:33.034]   severity: 'NOTICE',
+[02:17:33.034]   code: '42P07',
+[02:17:33.034]   message: 'relation "Message" already exists, skipping',
+[02:17:33.034]   file: 'parse_utilcmd.c',
+[02:17:33.034]   line: '207',
+[02:17:33.034]   routine: 'transformCreateStmt'
+[02:17:33.034] }
+[02:17:33.255] {
+[02:17:33.255]   severity_local: 'NOTICE',
+[02:17:33.255]   severity: 'NOTICE',
+[02:17:33.255]   code: '42P07',
+[02:17:33.255]   message: 'relation "Vote" already exists, skipping',
+[02:17:33.255]   file: 'parse_utilcmd.c',
+[02:17:33.255]   line: '207',
+[02:17:33.255]   routine: 'transformCreateStmt'
+[02:17:33.255] }
+[02:17:33.699] ❌ Migration failed
+[02:17:33.702] PostgresError: column "title" of relation "Chat" already exists
+[02:17:33.702]     at ErrorResponse (/vercel/path0/node_modules/.pnpm/postgres@3.4.5/node_modules/postgres/cjs/src/connection.js:788:26)
+[02:17:33.702]     at handle (/vercel/path0/node_modules/.pnpm/postgres@3.4.5/node_modules/postgres/cjs/src/connection.js:474:6)
+[02:17:33.702]     at Socket.data (/vercel/path0/node_modules/.pnpm/postgres@3.4.5/node_modules/postgres/cjs/src/connection.js:315:9)
+[02:17:33.702]     at Socket.emit (node:events:518:28)
+[02:17:33.702]     at addChunk (node:internal/streams/readable:561:12)
+[02:17:33.702]     at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+[02:17:33.702]     at Readable.push (node:internal/streams/readable:392:5)
+[02:17:33.702]     at TCP.onStreamRead (node:internal/stream_base_commons:189:23) {
+[02:17:33.702]   severity_local: 'ERROR',
+[02:17:33.702]   severity: 'ERROR',
+[02:17:33.702]   code: '42701',
+[02:17:33.702]   file: 'tablecmds.c',
+[02:17:33.708]   line: '7445',
+[02:17:33.708]   routine: 'check_for_column_name_collision'
+[02:17:33.708] }
+[02:17:33.720]  ELIFECYCLE  Command failed with exit code 1.
+[02:17:33.741] Error: Command "pnpm run build" exited with 1
